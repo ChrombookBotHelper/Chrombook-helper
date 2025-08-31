@@ -3,45 +3,71 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>Chrombook Helfer Bot – v8 (DE/EN)</title>
+  <title>Chrombook Helfer Bot – v9 (DE/EN + Bot-Chat löschen + Mobile)</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <style>
-    :root{--bg:#0b0f19;--panel:#121a2a;--panel2:#0f1726;--border:#20304e;--text:#e9eef7;--muted:#a3b0c7}
-    *{box-sizing:border-box}html,body{height:100%;margin:0;background:radial-gradient(1200px 800px at 10% -10%,#1b2440 0,transparent 60%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif}
-    .app{max-width:980px;margin:auto;display:flex;flex-direction:column;min-height:100dvh;padding:12px}
-    header{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,rgba(109,124,255,.25),rgba(0,212,255,.12)),var(--panel);border:1px solid var(--border);border-radius:14px;padding:8px 10px}
-    .row{display:flex;align-items:center;gap:10px}.sp{flex:1}
-    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;user-select:none}
-    .logo svg{width:32px;height:32px;border-radius:8px}.title{font-weight:700}
-    button{font:inherit;color:var(--text);background:linear-gradient(180deg,#1b2440,#121a2a);border:1px solid var(--border);padding:10px 14px;border-radius:12px;cursor:pointer}
-    button:hover{filter:brightness(1.06)}.ghost{background:transparent;border-color:var(--border)}
-    .pill{padding:6px 10px;border:1px solid var(--border);border-radius:999px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
-    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}@media (min-width:680px){.cards{grid-template-columns:repeat(4,1fr)}}
-    .card{border:1px solid var(--border);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:16px;padding:12px}
-    .card h4{margin:0 0 6px;font-size:14px;color:#c9d7ff}.card p{margin:0 0 8px;font-size:13px;color:var(--muted)}
-    .chatWrap{margin-top:10px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,#0e152b,#0b1120)}
-    .chatTabs{display:flex;gap:8px;padding:8px;border-bottom:1px solid var(--border)}
-    .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:linear-gradient(180deg,#121a2a,#0f1726);cursor:pointer;font-size:14px}
-    .tab.active{outline:2px solid rgba(109,124,255,.5)}.modeInfo{margin-left:auto;font-size:12px;color:#a3b0c7;display:flex;align-items:center;gap:8px}
-    .dot{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block}.dot.live{background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.12)}
-    .chat{padding:12px;display:flex;flex-direction:column;gap:10px;min-height:44dvh}
-    .msg{display:flex;gap:8px;align-items:flex-start}.msg .bubble{background:linear-gradient(180deg,#121a2a,#0f1726);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4;white-space:pre-wrap}
-    .msg.user .bubble{background:linear-gradient(180deg,#0f1524,#0a0f19)}.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 35%,#9bb3ff,#6d7cff 40%,#0b0f19 70%);border:1px solid rgba(255,255,255,.12)}
-    .composer{position:sticky;bottom:0;display:flex;gap:8px;border-top:1px solid var(--border);padding:8px;background:linear-gradient(180deg,#0b1120,#0b1120);border-radius:0 0 16px 16px}
-    .composer input{flex:1;border:1px solid var(--border);border-radius:10px;padding:12px 12px;background:#0b1120;color:#e9eef7}
-    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(0,0,0,.6);border:1px solid var(--border);padding:10px 12px;border-radius:12px;z-index:40}
-    .fab{position:fixed;right:16px;bottom:84px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(109,124,255,.85),rgba(0,212,255,.65));border:1px solid rgba(255,255,255,.18);z-index:15}
-    .badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center;background:#ff6b6b;color:#fff;border-radius:999px;font-size:11px;font-weight:700;border:1px solid rgba(255,255,255,.35)}
-    .modal-backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.55);z-index:20}
-    .modal{width:min(780px,96vw);background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:16px;padding:14px}
-    .modal input,.modal textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0b1120;color:#e9eef7}
-    .rowbtn{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.hidden{display:none !important}.meta{font-size:12px;color:#a3b0c7}
-    .ticket{border:1px solid var(--border);border-radius:12px;padding:10px;background:linear-gradient(180deg,#0f1526,#0c1222);margin-top:8px}
-    .tag{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:11px;color:#c9d7ff}
-    .thread{max-height:38vh;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:10px;background:linear-gradient(180deg,#0f1526,#0c1222)}
-    .tmsg{display:flex;gap:8px;margin-bottom:8px}.tmsg .who{font-weight:700;font-size:12px;color:#c9d7ff;min-width:100px}.tmsg .txt{white-space:pre-wrap}.right{justify-content:flex-end}
+    :root{
+      --bg:#0b0f19; --panel:#121a2a; --panel2:#0f1726; --border:#20304e; --text:#e9eef7; --muted:#a3b0c7;
+      --accent:#6d7cff; --accent2:#00d4ff; --danger:#ff6b6b; --success:#3ddc97;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; overflow-x:hidden; background: radial-gradient(1200px 800px at 10% -10%, #1b2440 0%, transparent 60%), var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif; }
+    .app{ max-width:980px; margin-inline:auto; display:flex; flex-direction:column; min-height:100dvh; padding:12px; }
+    header{ position:sticky; top:0; z-index:5; background: linear-gradient(135deg, rgba(109,124,255,.25), rgba(0,212,255,.12)), var(--panel); border:1px solid var(--border); border-radius:14px; padding:8px 10px; }
+    .row{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+    .sp{ flex:1; }
+    .logo{ display:flex; align-items:center; gap:8px; text-decoration:none; color:inherit; user-select:none; min-width:0; }
+    .logo svg{ width:28px; height:28px; border-radius:8px; flex:0 0 auto; }
+    .title{ font-weight:700; font-size: clamp(14px, 2.4vw, 17px); line-height:1.1; white-space:nowrap; }
+    .brandSub{ font-size:11px; color:#8ea2ff; white-space:nowrap; }
+    button{ font:inherit; color:var(--text); background: linear-gradient(180deg,#1b2440,#121a2a); border:1px solid var(--border); padding:8px 10px; border-radius:10px; cursor:pointer; white-space:nowrap; }
+    button:hover{ filter:brightness(1.06); }
+    .ghost{ background:transparent; border-color:var(--border); }
+    .pill{ padding:5px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; display:inline-flex; align-items:center; gap:6px; }
+    .cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:10px; }
+    @media (min-width:680px){ .cards{ grid-template-columns:repeat(4,1fr); } }
+    .card{ border:1px solid var(--border); background: linear-gradient(180deg,var(--panel),var(--panel2)); border-radius:16px; padding:12px; }
+    .card h4{ margin:0 0 6px; font-size:14px; color:#c9d7ff; }
+    .card p{ margin:0 0 8px; font-size:13px; color:var(--muted); }
+    .chatWrap{ margin-top:10px; border:1px solid var(--border); border-radius:16px; background: linear-gradient(180deg,#0e152b,#0b1120); }
+    .chatTabs{ display:flex; gap:8px; padding:8px; border-bottom:1px solid var(--border); align-items:center; }
+    .tab{ padding:8px 12px; border-radius:999px; border:1px solid var(--border); background:linear-gradient(180deg,#121a2a,#0f1726); cursor:pointer; font-size:14px; }
+    .tab.active{ outline:2px solid rgba(109,124,255,.5); }
+    .tab.slim{ padding:6px 8px; font-size:12px; margin-left:auto; }
+    .chat{ padding:12px; display:flex; flex-direction:column; gap:10px; min-height:44dvh; }
+    .msg{ display:flex; gap:8px; align-items:flex-start; }
+    .msg .bubble{ background: linear-gradient(180deg,#121a2a,#0f1726); border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.4; white-space:pre-wrap; }
+    .msg.user .bubble{ background: linear-gradient(180deg,#0f1524,#0a0f19); }
+    .avatar{ width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background: radial-gradient(circle at 35% 35%, #9bb3ff, #6d7cff 40%, #0b0f19 70%); border:1px solid rgba(255,255,255,.12); flex:0 0 auto; }
+    .composer{ position:sticky; bottom:0; display:flex; gap:8px; border-top:1px solid var(--border); padding:8px; background: linear-gradient(180deg,#0b1120,#0b1120); border-radius:0 0 16px 16px; }
+    .composer input{ flex:1; border:1px solid var(--border); border-radius:10px; padding:12px 12px; background:#0b1120; color:#e9eef7; }
+    .toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:14px; background: rgba(0,0,0,.6); border:1px solid var(--border); padding:10px 12px; border-radius:12px; z-index:40; }
+    .fab{ position:fixed; right:16px; bottom:84px; width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background: linear-gradient(135deg, rgba(109,124,255,.85), rgba(0,212,255,.65)); border:1px solid rgba(255,255,255,.18); z-index:15; }
+    .badge{ position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; padding:0 5px; display:grid; place-items:center; background: var(--danger); color:white; border-radius:999px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,.35); }
+    .modal-backdrop{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; background: rgba(0,0,0,.55); z-index:20; }
+    .modal{ width:min(780px,96vw); background: linear-gradient(180deg,var(--panel),var(--panel2)); border:1px solid var(--border); border-radius:16px; padding:14px; }
+    .modal input, .modal textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0b1120; color:#e9eef7; }
+    .rowbtn{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .hidden{ display:none !important; }
+    .meta{ font-size:12px; color:var(--muted); }
+    .ticket{ border:1px solid var(--border); border-radius:12px; padding:10px; background: linear-gradient(180deg,#0f1526,#0c1222); margin-top:8px; }
+    .tag{ display:inline-block; border:1px solid var(--border); border-radius:999px; padding:2px 8px; font-size:11px; color:#c9d7ff; }
+    .thread{ max-height:38vh; overflow:auto; border:1px solid var(--border); border-radius:12px; padding:10px; background: linear-gradient(180deg,#0f1526,#0c1222); }
+    .tmsg{ display:flex; gap:8px; margin-bottom:8px; }
+    .tmsg .who{ font-weight:700; font-size:12px; color:#c9d7ff; min-width:100px; }
+    .tmsg .txt{ white-space:pre-wrap; }
+    .right{ justify-content: flex-end; }
+    @media (max-width: 480px){
+      header{ padding:6px 8px; }
+      .row{ gap:6px; }
+      .logo svg{ width:24px; height:24px; }
+      .title{ font-size:14px; }
+      .brandSub{ display:none; }
+      button{ padding:6px 8px; font-size:12px; }
+      .pill{ display:none; }
+    }
   </style>
 </head>
 <body>
@@ -50,20 +76,21 @@
       <div class="row">
         <a href="#" class="logo" id="logo" title="Chrombook Helfer">
           <svg viewBox="0 0 64 64" aria-hidden="true">
-            <defs><radialGradient id="lg" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#cfe3ff"/><stop offset="40%" stop-color="#7ea3ff"/><stop offset="100%" stop-color="#0a0f1d"/></radialGradient></defs>
+            <defs><radialGradient id="lg" cx="50%" cy="50%" r="70%">
+              <stop offset="0%" stop-color="#cfe3ff"/><stop offset="40%" stop-color="#7ea3ff"/><stop offset="100%" stop-color="#0a0f1d"/></radialGradient></defs>
             <rect width="64" height="64" rx="12" fill="url(#lg)"/>
             <g opacity="0.9"><circle cx="16" cy="18" r="2" fill="white"/><circle cx="46" cy="14" r="1.2" fill="white"/><circle cx="40" cy="34" r="1.1" fill="white"/><circle cx="24" cy="48" r="1.2" fill="white"/></g>
             <path d="M10 50 Q32 30 54 50" stroke="#7ef3ff" stroke-width="2" fill="none" opacity="0.8"/>
           </svg>
           <div>
             <div class="title">Chrombook&nbsp;Helfer</div>
-            <div class="meta">Galaxy • Dark</div>
+            <div class="brandSub">Galaxy • Dark</div>
           </div>
         </a>
         <div class="sp"></div>
-        <span id="livePill" class="pill"><span class="dot" id="liveDot"></span><span id="modeLabel">Offline</span></span>
+        <span id="livePill" class="pill"><span class="dot" id="liveDot" style="width:8px;height:8px;border-radius:50%;background:#666;display:inline-block"></span><span id="modeLabel">Offline</span></span>
         <button id="langBtn" class="ghost" title="Sprache">DE • EN</button>
-        <button id="contactBtn" title="Mitarbeiter kontaktieren">Kontakt • Mitarbeiter</button>
+        <button id="contactBtn" title="Mitarbeiter kontaktieren">Kontakt</button>
         <button id="logoutBtn" class="ghost hidden" title="Mitarbeiter abmelden">Abmelden</button>
       </div>
     </header>
@@ -79,6 +106,7 @@
       <div class="chatTabs">
         <button class="tab" id="tabBot">🤖 Bot</button>
         <button class="tab" id="tabStaff">👨‍💻 Mitarbeiter</button>
+        <button class="tab slim" id="clearBotBtn" title="Bot-Chat löschen">🗑️</button>
       </div>
       <section class="chat" id="chat" aria-live="polite" aria-label="Chatverlauf"></section>
       <form class="composer" id="composer" autocomplete="off">
@@ -108,7 +136,9 @@
     <div class="modal">
       <h3 id="ticketsTitle">💬 Chat-Center <span class="meta" id="openCount">(0 offen)</span></h3>
       <div id="ticketsList"></div>
-      <div class="rowbtn"><button id="closeTickets" type="button">Schließen</button></div>
+      <div class="rowbtn">
+        <button id="closeTickets" type="button">Schließen</button>
+      </div>
     </div>
   </div>
 
@@ -151,91 +181,294 @@
   <script>
   document.addEventListener('DOMContentLoaded', function(){
     const firebaseConfig = {apiKey:"AIzaSyDN1MZv_q38Zoymt92BHWTe9sUNwteT1KA",authDomain:"sample-firebase-ai-app-b02a4.firebaseapp.com",projectId:"sample-firebase-ai-app-b02a4",storageBucket:"sample-firebase-ai-app-b02a4.firebasestorage.app",messagingSenderId:"382050648468",appId:"1:382050648468:web:8c6f34051a7b2991ebcf81"};
+    const I18N={de:{tabs:{bot:"🤖 Bot",staff:"👨‍💻 Mitarbeiter"},contactBtn:"Kontakt",logout:"Abmelden",composerPH:"Nachricht schreiben …",clearBot:"🗑️ Bot-Chat löschen",confirmClear:"Möchtest du den Bot-Chat wirklich löschen? Das kann nicht rückgängig gemacht werden.",contact:{title:"👋 Mitarbeiter kontaktieren",label:"Nachricht",cancel:"Abbrechen",send:"Absenden",placeholder:"Worum geht es?"},tickets:{title:"💬 Chat-Center",none:"Keine Anfragen vorhanden.",open:"Öffnen",resolve:"Als erledigt",del:"Löschen"},reply:{title:"Thread",back:"Zurück",resolve:"Als erledigt",send:"Antwort senden",ph:"Antwort schreiben …",whoStaff:"Mitarbeiter",whoUser:"Kunde"},staffHeader:"Chat mit Mitarbeiter • Ticket ##",staffNoActive:"Kein aktiver Mitarbeiter-Chat. Starte einen Kontakt oben über „Kontakt“. ",toast:{offline:"Live-Chat offline. Bitte Internet prüfen.",created:"Ticket erstellt und Mitarbeiter-Chat geöffnet ✅",wrongCode:"Falscher Code.",wrongEmail:"E-Mail stimmt nicht.",wrongCode2:"Falscher zweiter Code.",loggedIn:"Mitarbeiter-Modus aktiviert 🛡️",loggedOut:"Abgemeldet.",needMsg:"Bitte Nachricht eingeben.",needReply:"Bitte eine Antwort schreiben."},cards:{c1h:"🚀 Erste Schritte",c1p:"Chromebook Basics & Shortcuts.",c1b:"Tastenkürzel",c2h:"⚙️ Leistung",c2p:"Langsam? So wird’s flotter.",c2b:"Schneller machen",c3h:"🐧 Linux & Dev",c3p:"Linux aktivieren & apt.",c3b:"Linux installieren",c4h:"🛍️ Apps",c4p:"Play-Store & PWAs.",c4b:"Apps & Spiele"},firstRun:"Willkommen! ✨ Du kannst oben zwischen 🤖 Bot und 👨‍💻 Mitarbeiter umschalten. Wenn du „Kontakt“ nutzt, öffnet sich direkt der Live-Chat. 🤝",meYou:{user:"Du",bot:"Helfer"},dateLocale:"de-DE",fabTitle:"Chat-Center (Mitarbeiter)"},en:{tabs:{bot:"🤖 Bot",staff:"👨‍💻 Support"},contactBtn:"Support",logout:"Sign out",composerPH:"Type a message…",clearBot:"🗑️ Clear bot chat",confirmClear:"Do you really want to clear the bot chat? This cannot be undone.",contact:{title:"👋 Contact support",label:"Message",cancel:"Cancel",send:"Send",placeholder:"What’s the issue?"},tickets:{title:"💬 Chat Center",none:"No requests yet.",open:"Open",resolve:"Mark as resolved",del:"Delete"},reply:{title:"Thread",back:"Back",resolve:"Mark as resolved",send:"Send reply",ph:"Write a reply…",whoStaff:"Support",whoUser:"Customer"},staffHeader:"Chat with Support • Ticket ##",staffNoActive:"No active support chat. Start one via “Support” above.",toast:{offline:"Live chat offline. Please check your connection.",created:"Ticket created and live support chat opened ✅",wrongCode:"Wrong code.",wrongEmail:"Email doesn’t match.",wrongCode2:"Wrong second code.",loggedIn:"Staff mode enabled 🛡️",loggedOut:"Signed out.",needMsg:"Please enter a message.",needReply:"Please write a reply."},cards:{c1h:"🚀 Getting started",c1p:"Chromebook basics & shortcuts.",c1b:"Shortcuts",c2h:"⚙️ Performance",c2p:"Slow? Here’s how to speed it up.",c2b:"Speed up",c3h:"🐧 Linux & Dev",c3p:"Enable Linux & apt.",c3b:"Install Linux",c4h:"🛍️ Apps",c4p:"Play Store & PWAs.",c4b:"Apps & games"},firstRun:"Welcome! ✨ You can switch between 🤖 Bot and 👨‍💻 Support above. If you use “Support”, the live chat opens right away. 🤝",meYou:{user:"You",bot:"Assistant"},dateLocale:"en-GB",fabTitle:"Chat center (staff)"}};
 
-    const I18N={de:{tabs:{bot:"🤖 Bot",staff:"👨‍💻 Mitarbeiter"},contactBtn:"Kontakt • Mitarbeiter",logout:"Abmelden",composerPH:"Nachricht schreiben …",contact:{title:"👋 Mitarbeiter kontaktieren",label:"Nachricht",cancel:"Abbrechen",send:"Absenden",placeholder:"Worum geht es?"},tickets:{title:"💬 Chat-Center",none:"Keine Anfragen vorhanden.",open:"Öffnen",resolve:"Als erledigt",del:"Löschen"},reply:{title:"Thread",back:"Zurück",resolve:"Als erledigt",send:"Antwort senden",ph:"Antwort schreiben …",whoStaff:"Mitarbeiter",whoUser:"Kunde"},staffHeader:"Chat mit Mitarbeiter • Ticket ##",staffNoActive:"Kein aktiver Mitarbeiter-Chat. Starte einen Kontakt oben über „Kontakt • Mitarbeiter“.",toast:{offline:"Live-Chat offline. Bitte Internet prüfen.",created:"Ticket erstellt und Mitarbeiter-Chat geöffnet ✅",wrongCode:"Falscher Code.",wrongEmail:"E-Mail stimmt nicht.",wrongCode2:"Falscher zweiter Code.",loggedIn:"Mitarbeiter-Modus aktiviert 🛡️",loggedOut:"Abgemeldet.",needMsg:"Bitte Nachricht eingeben.",needReply:"Bitte eine Antwort schreiben."},login:{s1:"🔒 Geheim: Mitarbeiter-Login (1/3)",s2:"📧 E-Mail (2/3)",s3:"🔑 Zweiter Code (3/3)",emailPH:"komplette Mitarbeiter-E-Mail",emailHint:"Hinweis: <strong>J1339K</strong> – gib deine komplette E-Mail ein.",code2PH:"TT.MM.JJJJ",cancel:"Abbrechen",next:"Weiter",back:"Zurück",finish:"Anmelden"},cards:{c1h:"🚀 Erste Schritte",c1p:"Chromebook Basics & Shortcuts.",c1b:"Tastenkürzel",c2h:"⚙️ Leistung",c2p:"Langsam? So wird’s flotter.",c2b:"Schneller machen",c3h:"🐧 Linux & Dev",c3p:"Linux aktivieren & apt.",c3b:"Linux installieren",c4h:"🛍️ Apps",c4p:"Play-Store & PWAs.",c4b:"Apps & Spiele"},firstRun:"Willkommen! ✨ Du kannst oben zwischen 🤖 Bot und 👨‍💻 Mitarbeiter umschalten. Wenn du „Kontakt • Mitarbeiter“ nutzt, öffnet sich direkt der Live-Chat. 🤝",meYou:{user:"Du",bot:"Helfer"},dateLocale:"de-DE",ticketsMetaFrom:"Von: ## • ",openCount:"(## offen)",fabTitle:"Chat-Center (Mitarbeiter)"},en:{tabs:{bot:"🤖 Bot",staff:"👨‍💻 Support"},contactBtn:"Contact • Support",logout:"Sign out",composerPH:"Type a message…",contact:{title:"👋 Contact support",label:"Message",cancel:"Cancel",send:"Send",placeholder:"What’s the issue?"},tickets:{title:"💬 Chat Center",none:"No requests yet.",open:"Open",resolve:"Mark as resolved",del:"Delete"},reply:{title:"Thread",back:"Back",resolve:"Mark as resolved",send:"Send reply",ph:"Write a reply…",whoStaff:"Support",whoUser:"Customer"},staffHeader:"Chat with Support • Ticket ##",staffNoActive:"No active support chat. Start one via “Contact • Support” above.",toast:{offline:"Live chat offline. Please check your connection.",created:"Ticket created and live support chat opened ✅",wrongCode:"Wrong code.",wrongEmail:"Email doesn’t match.",wrongCode2:"Wrong second code.",loggedIn:"Staff mode enabled 🛡️",loggedOut:"Signed out.",needMsg:"Please enter a message.",needReply:"Please write a reply."},login:{s1:"🔒 Secret: Staff login (1/3)",s2:"📧 Email (2/3)",s3:"🔑 Second code (3/3)",emailPH:"full staff email",emailHint:"Hint: <strong>J1339K</strong> – please enter your full email.",code2PH:"DD.MM.YYYY",cancel:"Cancel",next:"Next",back:"Back",finish:"Sign in"},cards:{c1h:"🚀 Getting started",c1p:"Chromebook basics & shortcuts.",c1b:"Shortcuts",c2h:"⚙️ Performance",c2p:"Slow? Here’s how to speed it up.",c2b:"Speed up",c3h:"🐧 Linux & Dev",c3p:"Enable Linux & apt.",c3b:"Install Linux",c4h:"🛍️ Apps",c4p:"Play Store & PWAs.",c4b:"Apps & games"},firstRun:"Welcome! ✨ You can switch between 🤖 Bot and 👨‍💻 Support above. If you use “Contact • Support”, the live chat opens right away. 🤝",meYou:{user:"You",bot:"Assistant"},dateLocale:"en-GB",ticketsMetaFrom:"From: ## • ",openCount:"(## open)",fabTitle:"Chat center (staff)"}};
-
-    const $=(s,r=document)=>r.querySelector(s);const hide=e=>e.classList.add('hidden');const show=e=>e.classList.remove('hidden');
+    const $=(s,r=document)=>r.querySelector(s), hide=e=>e.classList.add('hidden'), show=e=>e.classList.remove('hidden');
     const toast=(t,ms=2200)=>{const e=$('#toast');e.innerHTML=t;show(e);setTimeout(()=>hide(e),ms)};
-    const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
-    const uid=()=>Math.random().toString(36).slice(2,10);let lang=load('cbh_lang','de');document.documentElement.lang=lang;
-    const deviceId=load('cbh_device')||(save('cbh_device','dev-'+uid()),load('cbh_device'));const fmt=t=>new Date(t).toLocaleString(I18N[lang].dateLocale,{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v)), load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+    const uid=()=>Math.random().toString(36).slice(2,10);
+    let lang=load('cbh_lang','de'); document.documentElement.lang=lang;
+    const deviceId=load('cbh_device')||(save('cbh_device','dev-'+uid()),load('cbh_device'));
+    const fmt=t=> new Date(t).toLocaleString(I18N[lang].dateLocale,{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
-    const liveDot=$('#liveDot'),modeLabel=$('#modeLabel'),langBtn=$('#langBtn');let botChat=load('cbh_bot_chat',[]);let tickets=[];let staff=sessionStorage.getItem('cbh_staff')==='1';let activeTicketId=load('cbh_active_ticket',null);let mode=load('cbh_mode','bot');
-    const chatEl=$('#chat'),input=$('#input');const contactBtn=$('#contactBtn'),badge=$('#badge');const fab=$('#fab');
-    const contactModal=$('#contactModal'),contactMsg=$('#contactMsg');const ticketsModal=$('#ticketsModal'),ticketsList=$('#ticketsList'),openCount=$('#openCount');const closeTicketsBtn=$('#closeTickets');
-    const replyModal=$('#replyModal'),thread=$('#thread'),replyText=$('#replyText'),replyTicketId=$('#replyTicketId');const sendReply=$('#sendReply'),replyBack=$('#replyBack'),replyResolve=$('#replyResolve');
-    const loginModal=$('#loginModal'),code1=$('#code1'),email=$('#email'),code2=$('#code2');const next1=$('#next1'),next2=$('#next2'),finishLogin=$('#finishLogin'),cancelLogin=$('#cancelLogin'),back1=$('#back1'),back2=$('#back2');
-    const logo=$('#logo'),logoutBtn=$('#logoutBtn');const tabBot=$('#tabBot'),tabStaff=$('#tabStaff');
-    const contactTitle=$('#contactTitle'),contactLabel=$('#contactLabel'),cancelContact=$('#cancelContact'),sendContact=$('#sendContact');
-    const ticketsTitle=$('#ticketsTitle'),closeTickets=$('#closeTickets');const replyTitle=$('#threadTitle'),replyBackBtn=$('#replyBack'),replyResolveBtn=$('#replyResolve'),sendReplyBtn=$('#sendReply');
-    const login1=$('#login1'),login2=$('#login2'),login3=$('#login3'),emailHint=$('#emailHint');
+    const liveDot=$('#liveDot'), modeLabel=$('#modeLabel'), langBtn=$('#langBtn');
+    let botChat=load('cbh_bot_chat',[]);
+    let tickets=[]; let staff=sessionStorage.getItem('cbh_staff')==='1';
+    let activeTicketId=load('cbh_active_ticket',null);
+    let mode=load('cbh_mode','bot');
+
+    const chatEl=$('#chat'), input=$('#input'); const contactBtn=$('#contactBtn'), badge=$('#badge'); const fab=$('#fab');
+    const contactModal=$('#contactModal'), contactMsg=$('#contactMsg');
+    const ticketsModal=$('#ticketsModal'), ticketsList=$('#ticketsList'), openCount=$('#openCount'); const closeTicketsBtn=$('#closeTickets');
+    const replyModal=$('#replyModal'), thread=$('#thread'), replyText=$('#replyText'), replyTicketId=$('#replyTicketId'); const sendReply=$('#sendReply'), replyBack=$('#replyBack'), replyResolve=$('#replyResolve');
+    const loginModal=$('#loginModal'), code1=$('#code1'), email=$('#email'), code2=$('#code2'); const next1=$('#next1'), next2=$('#next2'), finishLogin=$('#finishLogin'), cancelLogin=$('#cancelLogin'), back1=$('#back1'), back2=$('#back2');
+    const logo=$('#logo'), logoutBtn=$('#logoutBtn'); const tabBot=$('#tabBot'), tabStaff=$('#tabStaff'), clearBotBtn=$('#clearBotBtn');
 
     const FB={enabled:false,app:null,db:null,auth:null,unsub:null};
-    try{FB.app=firebase.initializeApp(firebaseConfig);FB.auth=firebase.auth();FB.db=firebase.firestore();FB.auth.signInAnonymously().then(()=>{FB.enabled=true;liveDot.classList.add('live');modeLabel.textContent='Live';subscribeTickets()}).catch(e=>{console.error(e);modeLabel.textContent='Offline'})}catch(e){console.error('Firebase init failed',e);modeLabel.textContent='Offline'}
+    try{
+      FB.app=firebase.initializeApp(firebaseConfig);
+      FB.auth=firebase.auth();
+      FB.db=firebase.firestore();
+      FB.auth.signInAnonymously().then(()=>{FB.enabled=true; liveDot.style.background='#3ddc97'; modeLabel.textContent='Live'; subscribeTickets();})
+        .catch(e=>{console.error(e); modeLabel.textContent='Offline';});
+    }catch(e){ console.error('Firebase init failed', e); modeLabel.textContent='Offline'; }
 
     function applyLang(){
-      const T=I18N[lang];document.documentElement.lang=lang;
-      tabBot.textContent=T.tabs.bot;tabStaff.textContent=T.tabs.staff;contactBtn.textContent=T.contactBtn;logoutBtn.textContent=T.logout;
-      input.placeholder=T.composerPH;$('#contactMsg').placeholder=T.contact.placeholder;contactTitle.textContent=T.contact.title;contactLabel.textContent=T.contact.label;cancelContact.textContent=T.contact.cancel;sendContact.textContent=T.contact.send;
-      $('#c1h').textContent=T.cards.c1h;$('#c1p').textContent=T.cards.c1p;$('#c1b').textContent=T.cards.c1b;$('#c2h').textContent=T.cards.c2h;$('#c2p').textContent=T.cards.c2p;$('#c2b').textContent=T.cards.c2b;$('#c3h').textContent=T.cards.c3h;$('#c3p').textContent=T.cards.c3p;$('#c3b').textContent=T.cards.c3b;$('#c4h').textContent=T.cards.c4h;$('#c4p').textContent=T.cards.c4p;$('#c4b').textContent=T.cards.c4b;
-      ticketsTitle.childNodes[0].textContent=T.tickets.title+' ';replyTitle.textContent=T.reply.title;replyBackBtn.textContent=T.reply.back;replyResolveBtn.textContent=T.reply.resolve;sendReplyBtn.textContent=T.reply.send;replyText.placeholder=T.reply.ph;
-      login1.textContent=T.login.s1;login2.textContent=T.login.s2;login3.textContent=T.login.s3;email.placeholder=T.login.emailPH;emailHint.innerHTML=T.login.emailHint;code2.placeholder=T.login.code2PH;cancelLogin.textContent=T.login.cancel;next1.textContent=T.login.next;next2.textContent=T.login.next;back1.textContent=T.login.back;back2.textContent=T.login.back;finishLogin.textContent=T.login.finish;
-      $('#fab').title=T.fabTitle;updateBadge();renderChat();
+      const T=I18N[lang];
+      tabBot.textContent=T.tabs.bot; tabStaff.textContent=T.tabs.staff;
+      contactBtn.textContent=T.contactBtn; logoutBtn.textContent=T.logout;
+      input.placeholder=T.composerPH; clearBotBtn.textContent=T.clearBot; clearBotBtn.title=T.clearBot;
+      $('#c1h').textContent=T.cards.c1h; $('#c1p').textContent=T.cards.c1p; $('#c1b').textContent=T.cards.c1b;
+      $('#c2h').textContent=T.cards.c2h; $('#c2p').textContent=T.cards.c2p; $('#c2b').textContent=T.cards.c2b;
+      $('#c3h').textContent=T.cards.c3h; $('#c3p').textContent=T.cards.c3p; $('#c3b').textContent=T.cards.c3b;
+      $('#c4h').textContent=T.cards.c4h; $('#c4p').textContent=T.cards.c4p; $('#c4b').textContent=T.cards.c4b;
+      renderChat();
     }
+    function applyStaffUI(){
+      const T=I18N[lang];
+      if(staff){ contactBtn.textContent=(lang==='de'?'Center':'Center'); contactBtn.title=(lang==='de'?'Chat-Center öffnen':'Open chat center'); show(logoutBtn); show(fab); }
+      else { contactBtn.textContent=T.contactBtn; contactBtn.title=(lang==='de'?'Mitarbeiter kontaktieren':'Contact support'); hide(logoutBtn); hide(fab); }
+    }
+    function applyResponsive(){
+      const w = window.innerWidth;
+      const T=I18N[lang];
+      if(w<=480){
+      }else{
+        if(staff){ contactBtn.textContent=(lang==='de'?'Chat-Center':'Chat center'); }
+        else { contactBtn.textContent=T.contactBtn; }
+      }
+    }
+    window.addEventListener('resize', applyResponsive);
 
-    const KB_DE=[{p:['hallo','hi','hey','moin','grüß'],r:'Hey! 👋 Ich bin dein Chrombook-Helfer. Frag mich alles zu Chromebook, Linux, Apps & Leistung. ✨'},{p:['tasten','shortcut','kürzel','kombination'],r:'⌨️ Shortcuts:\n• Screenshot: Strg+▢||\n• Bereich: Strg+Umschalt+▢||\n• Tab neu/schließen: Strg+T / Strg+W\n• Task-Manager: Such + Esc 🙂'},{p:['linux','crostini'],r:'🐧 Linux: Einstellungen → Entwickler → Linux aktivieren. Dann: sudo apt update && sudo apt upgrade -y • sudo apt install git curl build-essential -y'},{p:['langsam','leistung','ruckelt','lag'],r:'⚡ Schneller machen: Tabs/Erweiterungen prüfen, Speicher aufräumen, Hardwarebeschleunigung aktivieren (Chrome → System), Neustart/Powerwash als letzter Schritt.'},{p:['apps','play','android'],r:'📱 Apps: Einstellungen → Apps → Play-Store aktivieren → im Store installieren. Viele Dienste auch als PWA verfügbar. 🛍️'},{p:['druck','drucker','pdf'],r:'🖨️ Drucken/PDF: Druck-Dialog → „Als PDF speichern“ oder Drucker unter Einstellungen → „Drucker“ hinzufügen. 📄'},{p:['hilfe','mitarbeiter','kontakt'],r:'🤝 Wenn du persönliche Hilfe brauchst: Wechsel oben auf „👨‍💻 Mitarbeiter“ oder nutze „Kontakt • Mitarbeiter“. Wir sind da!'}];
-    const KB_EN=[{p:['hello','hi','hey','yo','greetings'],r:'Hey! 👋 I’m your Chromebook helper. Ask me anything about ChromeOS, Linux, apps and performance. ✨'},{p:['keys','shortcut','shortcuts','hotkey','hotkeys'],r:'⌨️ Shortcuts:\n• Screenshot: Ctrl+Show windows (▢||)\n• Area screenshot: Ctrl+Shift+Show windows (▢||)\n• New/close tab: Ctrl+T / Ctrl+W\n• Task manager: Search (🔍) + Esc 🙂'},{p:['linux','crostini'],r:'🐧 Linux: Settings → Developers → Linux development environment. Then: sudo apt update && sudo apt upgrade -y • sudo apt install git curl build-essential -y'},{p:['slow','lag','performance','stutter'],r:'⚡ Speed up: review tabs/extensions, free storage, enable hardware acceleration (Chrome → System), restart / Powerwash as a last resort.'},{p:['apps','play','android','pwa'],r:'📱 Apps: enable the Play Store in Settings → Apps → Google Play Store, or install PWAs from the web. 🛍️'},{p:['print','printer','pdf'],r:'🖨️ Printing/PDF: use “Save as PDF” in the print dialog, or add printers under Settings → Printing.'},{p:['help','human','support','contact'],r:'🤝 Need personal help? Switch to “👨‍💻 Support” above or use “Contact • Support”. We’ve got you!'}];
+    const KB_DE=[{p:['hallo','hi','hey','moin','grüß'],r:'Hey! 👋 Ich bin dein Chrombook-Helfer. Frag mich alles zu Chromebook, Linux, Apps & Leistung. ✨'},{p:['tasten','shortcut','kürzel','kombination'],r:'⌨️ Shortcuts:\n• Screenshot: Strg+▢||\n• Bereich: Strg+Umschalt+▢||\n• Tab neu/schließen: Strg+T / Strg+W\n• Task-Manager: Such + Esc 🙂'},{p:['linux','crostini'],r:'🐧 Linux: Einstellungen → Entwickler → Linux aktivieren. Dann: sudo apt update && sudo apt upgrade -y • sudo apt install git curl build-essential -y'},{p:['langsam','leistung','ruckelt','lag'],r:'⚡ Schneller machen: Tabs/Erweiterungen prüfen, Speicher aufräumen, Hardwarebeschleunigung aktivieren (Chrome → System), Neustart/Powerwash als letzter Schritt.'},{p:['apps','play','android'],r:'📱 Apps: Einstellungen → Apps → Play-Store aktivieren → im Store installieren. Viele Dienste auch als PWA verfügbar. 🛍️'},{p:['druck','drucker','pdf'],r:'🖨️ Drucken/PDF: Druck-Dialog → „Als PDF speichern“ oder Drucker unter Einstellungen → „Drucker“ hinzufügen. 📄'},{p:['hilfe','mitarbeiter','kontakt'],r:'🤝 Wenn du persönliche Hilfe brauchst: Wechsel oben auf „👨‍💻 Mitarbeiter“ oder nutze „Support“. Wir sind da!'}];
+    const KB_EN=[{p:['hello','hi','hey','yo','greetings'],r:'Hey! 👋 I’m your Chromebook helper. Ask me anything about ChromeOS, Linux, apps and performance. ✨'},{p:['keys','shortcut','shortcuts','hotkey','hotkeys'],r:'⌨️ Shortcuts:\n• Screenshot: Ctrl+Show windows (▢||)\n• Area screenshot: Ctrl+Shift+Show windows (▢||)\n• New/close tab: Ctrl+T / Ctrl+W\n• Task manager: Search (🔍) + Esc 🙂'},{p:['linux','crostini'],r:'🐧 Linux: Settings → Developers → Linux development environment. Then: sudo apt update && sudo apt upgrade -y • sudo apt install git curl build-essential -y'},{p:['slow','lag','performance','stutter'],r:'⚡ Speed up: review tabs/extensions, free storage, enable hardware acceleration (Chrome → System), restart / Powerwash as a last resort.'},{p:['apps','play','android','pwa'],r:'📱 Apps: enable the Play Store in Settings → Apps → Google Play Store, or install PWAs from the web. 🛍️'},{p:['print','printer','pdf'],r:'🖨️ Printing/PDF: use “Save as PDF” in the print dialog, or add printers under Settings → Printing.'},{p:['help','human','support','contact'],r:'🤝 Need personal help? Switch to “👨‍💻 Support” above or use “Support”. We’ve got you!'}];
     function botAnswer(q){const KB=lang==='de'?KB_DE:KB_EN;const s=(q||'').toLowerCase();for(const e of KB){if(e.p.some(x=>s.includes(x)))return e.r+' ✨'}return lang==='de'?'Ich bin mir nicht sicher. 🤔➡️ Ich verweise dich an einen Mitarbeiter. Wechsle auf „👨‍💻 Mitarbeiter“. 🙌':'I’m not sure. 🤔➡️ I’ll refer you to a human. Switch to “👨‍💻 Support”. 🙌'}
 
-    function normalizeDoc(id,d){const messages=Array.isArray(d.messages)?d.messages.slice():[];if(messages.length===0){if(d.message)messages.push({by:'user',text:d.message,time:d.time||Date.now()});if(Array.isArray(d.replies)){for(const r of d.replies){messages.push({by:'staff',text:r.text,time:r.time||Date.now()})}}}return{id,from:d.from,time:d.time||0,status:d.status||'offen',message:d.message||(messages[0]?.text||''),messages}}
-    async function createTicket(message){const ref=await FB.db.collection('cbh_tickets').add({from:deviceId,message,time:Date.now(),status:'offen',messages:[{by:'user',text:message,time:Date.now()}]});activeTicketId=ref.id;save('cbh_active_ticket',activeTicketId);mode='staff';renderChat();toast(I18N[lang].toast.created)}
-    async function sendToStaff(text){if(!activeTicketId){await createTicket(text);return}await FB.db.collection('cbh_tickets').doc(activeTicketId).update({messages:firebase.firestore.FieldValue.arrayUnion({by:'user',text, time:Date.now()})})}
+    function renderBotChat(){
+      const MY=I18N[lang].meYou||{user:(lang==='de'?'Du':'You'), bot:(lang==='de'?'Helfer':'Assistant')};
+      chatEl.innerHTML='';
+      for(const m of botChat){
+        const wrap=document.createElement('div'); wrap.className='msg '+(m.role==='user'?'user':'bot');
+        const avatar=document.createElement('div'); avatar.className='avatar'; avatar.textContent=m.role==='user'?'👤':'🤖';
+        const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=m.text;
+        const meta=document.createElement('div'); meta.className='meta'; meta.textContent=(m.role==='user'?MY.user:MY.bot)+' • '+fmt(m.time);
+        const col=document.createElement('div'); col.appendChild(bubble); col.appendChild(meta);
+        wrap.appendChild(avatar); wrap.appendChild(col); chatEl.appendChild(wrap);
+      }
+      chatEl.scrollTop=chatEl.scrollHeight;
+      save('cbh_bot_chat', botChat);
+    }
+    function renderStaffChat(){
+      chatEl.innerHTML='';
+      let t=tickets.find(x=>x.id===activeTicketId);
+      if(!t){
+        const my=tickets.filter(x=>x.from===deviceId).sort((a,b)=>(b.time||0)-(a.time||0));
+        if(my[0]){ activeTicketId=my[0].id; save('cbh_active_ticket', activeTicketId); t=my[0]; }
+      }
+      if(!t){
+        chatEl.innerHTML='<div class="meta">'+(lang==='de'?'Kein aktiver Mitarbeiter-Chat. Starte einen Kontakt oben über „Kontakt“.':'No active support chat. Start one via “Support” above.')+'</div>';
+        return;
+      }
+      const hdr=document.createElement('div'); hdr.className='meta';
+      hdr.textContent=(lang==='de'?'Chat mit Mitarbeiter • Ticket ':'Chat with Support • Ticket ')+t.id+(t.status==='erledigt'?(lang==='de'?' (erledigt)':' (resolved)'):'');
+      chatEl.appendChild(hdr);
+      const msgs=Array.isArray(t.messages)?t.messages:[];
+      for(const m of msgs){
+        const wrap=document.createElement('div'); wrap.className='msg '+(m.by==='user'?'user':'bot');
+        const avatar=document.createElement('div'); avatar.className='avatar'; avatar.textContent=m.by==='user'?'👤':'👨‍💻';
+        const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=m.text;
+        const who=m.by==='user'?(lang==='de'?'Du':'You'):(lang==='de'?'Mitarbeiter':'Support');
+        const meta=document.createElement('div'); meta.className='meta'; meta.textContent=who+' • '+fmt(m.time);
+        const col=document.createElement('div'); col.appendChild(bubble); col.appendChild(meta);
+        wrap.appendChild(avatar); wrap.appendChild(col); chatEl.appendChild(wrap);
+      }
+      chatEl.scrollTop=chatEl.scrollHeight;
+    }
+    function renderChat(){
+      tabBot.classList.toggle('active', mode==='bot');
+      tabStaff.classList.toggle('active', mode==='staff');
+      if(mode==='bot'){ show(clearBotBtn); } else { hide(clearBotBtn); }
+      if(mode==='bot') renderBotChat(); else renderStaffChat();
+      save('cbh_mode', mode);
+    }
 
-    function renderBotChat(){const MY=I18N[lang].meYou;chatEl.innerHTML='';for(const m of botChat){const w=document.createElement('div');w.className='msg '+(m.role==='user'?'user':'bot');const a=document.createElement('div');a.className='avatar';a.textContent=m.role==='user'?'👤':'🤖';const b=document.createElement('div');b.className='bubble';b.textContent=m.text;const me=document.createElement('div');me.className='meta';me.textContent=(m.role==='user'?MY.user:MY.bot)+' • '+fmt(m.time);const col=document.createElement('div');col.appendChild(b);col.appendChild(me);w.appendChild(a);w.appendChild(col);chatEl.appendChild(w)}chatEl.scrollTop=chatEl.scrollHeight;save('cbh_bot_chat',botChat)}
-    function renderStaffChat(){const T=I18N[lang];chatEl.innerHTML='';let t=tickets.find(x=>x.id===activeTicketId);if(!t){const my=tickets.filter(x=>x.from===deviceId).sort((a,b)=>(b.time||0)-(a.time||0));if(my[0]){activeTicketId=my[0].id;save('cbh_active_ticket',activeTicketId);t=my[0]}}if(!t){chatEl.innerHTML='<div class="meta">'+T.staffNoActive+'</div>';return}const hdr=document.createElement('div');hdr.className='meta';hdr.textContent=T.staffHeader.replace('##',t.id)+(t.status==='erledigt'?(lang==='de'?' (erledigt)':' (resolved)'):'');chatEl.appendChild(hdr);const msgs=Array.isArray(t.messages)?t.messages:[];for(const m of msgs){const w=document.createElement('div');w.className='msg '+(m.by==='user'?'user':'bot');const a=document.createElement('div');a.className='avatar';a.textContent=m.by==='user'?'👤':'👨‍💻';const b=document.createElement('div');b.className='bubble';b.textContent=m.text;const who=m.by==='user'?(lang==='de'?'Du':'You'):(lang==='de'?'Mitarbeiter':'Support');const me=document.createElement('div');me.className='meta';me.textContent=who+' • '+fmt(m.time);const col=document.createElement('div');col.appendChild(b);col.appendChild(me);w.appendChild(a);w.appendChild(col);chatEl.appendChild(w)}chatEl.scrollTop=chatEl.scrollHeight}
-    function renderChat(){tabBot.classList.toggle('active',mode==='bot');tabStaff.classList.toggle('active',mode==='staff');if(mode==='bot')renderBotChat();else renderStaffChat();save('cbh_mode',mode)}
+    function clearBotChat(){
+      const msg = I18N[lang].confirmClear;
+      if(confirm(msg)){
+        botChat = [];
+        save('cbh_bot_chat', botChat);
+        renderBotChat();
+        toast(lang==='de'?'Bot-Chat gelöscht ✅':'Bot chat cleared ✅');
+      }
+    }
+    clearBotBtn.addEventListener('click', clearBotChat);
 
-    document.querySelector('#composer').addEventListener('submit',async ev=>{ev.preventDefault();const val=(input.value||'').trim();if(!val)return;if(val==='/login'){openLogin();input.value='';return}if(val==='/en'){lang='en';save('cbh_lang',lang);applyLang();input.value='';return}if(val==='/de'){lang='de';save('cbh_lang',lang);applyLang();input.value='';return}if(mode==='bot'){botChat.push({role:'user',text:val,time:Date.now()});renderBotChat();setTimeout(()=>{botChat.push({role:'bot',text:botAnswer(val),time:Date.now()});renderBotChat()},150)}else{if(!FB.enabled){toast(I18N[lang].toast.offline);input.value='';return}await sendToStaff(val)}input.value=''});
-    tabBot.addEventListener('click',()=>{mode='bot';renderChat()});tabStaff.addEventListener('click',()=>{mode='staff';renderChat()});
+    document.querySelector('#composer').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const val=(input.value||'').trim(); if(!val) return;
+      if(val === '/login'){ openLogin(); input.value=''; return; }
+      if(val === '/en'){ lang='en'; save('cbh_lang',lang); applyLang(); input.value=''; return; }
+      if(val === '/de'){ lang='de'; save('cbh_lang',lang); applyLang(); input.value=''; return; }
+      if(mode==='bot'){
+        botChat.push({role:'user', text: val, time: Date.now()});
+        renderBotChat();
+        setTimeout(()=>{
+          botChat.push({role:'bot', text: botAnswer(val), time: Date.now()});
+          renderBotChat();
+        }, 150);
+      }else{
+        if(!FB.enabled){ toast(I18N[lang].toast.offline); input.value=''; return; }
+        await FB.db.collection('cbh_tickets').doc(activeTicketId || '_').get().then(async doc=>{
+          if(!activeTicketId || !doc.exists){
+            const ref = await FB.db.collection('cbh_tickets').add({ from: deviceId, message: val, time: Date.now(), status: 'offen', messages: [{by:'user', text: val, time: Date.now()}]});
+            activeTicketId = ref.id; save('cbh_active_ticket', activeTicketId);
+          }else{
+            await FB.db.collection('cbh_tickets').doc(activeTicketId).update({ messages: firebase.firestore.FieldValue.arrayUnion({by:'user', text: val, time: Date.now()}) });
+          }
+        }).catch(async ()=>{
+          const ref = await FB.db.collection('cbh_tickets').add({ from: deviceId, message: val, time: Date.now(), status: 'offen', messages: [{by:'user', text: val, time: Date.now()}]});
+          activeTicketId = ref.id; save('cbh_active_ticket', activeTicketId);
+        });
+      }
+      input.value='';
+    });
+
+    tabBot.addEventListener('click', ()=>{ mode='bot'; renderChat(); });
+    tabStaff.addEventListener('click', ()=>{ mode='staff'; renderChat(); });
 
     const BOT_PROMPTS={de:{shortcuts:'Welche Tastenkürzel gibt es?',speed:'Mein Chromebook ist langsam. Was tun?',linux:'Wie installiere ich Linux (Crostini)?',apps:'Wie installiere ich Apps?'},en:{shortcuts:'What are the most useful shortcuts?',speed:'My Chromebook is slow. What can I do?',linux:'How do I install Linux (Crostini)?',apps:'How do I install apps?'}};
-    document.querySelector('#cards').addEventListener('click',e=>{const b=e.target.closest('button[data-intent]');if(!b)return;const m=BOT_PROMPTS[lang][b.dataset.intent];if(m){botChat.push({role:'user',text:m,time:Date.now()});setTimeout(()=>{botChat.push({role:'bot',text:botAnswer(m),time:Date.now()});renderBotChat()},150);renderBotChat()}});
+    document.querySelector('#cards').addEventListener('click',(e)=>{
+      const b=e.target.closest('button[data-intent]'); if(!b) return;
+      const m=BOT_PROMPTS[lang][b.dataset.intent];
+      if(m){ botChat.push({role:'user', text:m, time:Date.now()}); setTimeout(()=>{ botChat.push({role:'bot', text: botAnswer(m), time: Date.now()}); renderBotChat(); }, 150); renderBotChat(); }
+    });
 
-    function openContact(){show(contactModal);$('#contactMsg').focus()}function closeContact(){hide(contactModal)}
-    contactBtn.addEventListener('click',()=>{if(staff)openTickets();else openContact()});$('#cancelContact').addEventListener('click',closeContact);
-    $('#sendContact').addEventListener('click',async ()=>{const msg=(contactMsg.value||'').trim();if(!msg){toast(I18N[lang].toast.needMsg);return}if(!FB.enabled){toast(I18N[lang].toast.offline);return}await createTicket(msg);contactMsg.value='';closeContact();mode='staff';renderChat()});
+    const contactTitle=$('#contactTitle'), contactLabel=$('#contactLabel'), cancelContact=$('#cancelContact'), sendContact=$('#sendContact');
+    function openContact(){ show(contactModal); $('#contactMsg').focus(); }
+    function closeContact(){ hide(contactModal); }
+    contactBtn.addEventListener('click', ()=>{ if(staff) openTickets(); else openContact(); });
+    cancelContact.addEventListener('click', closeContact);
+    sendContact.addEventListener('click', async ()=>{
+      const msg=(contactMsg.value||'').trim(); if(!msg){ toast(I18N[lang].toast.needMsg); return; }
+      if(!FB.enabled){ toast(I18N[lang].toast.offline); return; }
+      const ref = await FB.db.collection('cbh_tickets').add({ from: deviceId, message: msg, time: Date.now(), status: 'offen', messages: [{by:'user', text: msg, time: Date.now()}]});
+      activeTicketId = ref.id; save('cbh_active_ticket', activeTicketId);
+      closeContact(); mode='staff'; renderChat(); toast(I18N[lang].toast.created);
+    });
 
-    function openTickets(){renderTickets();show(ticketsModal)}function closeTicketsModal(){hide(ticketsModal)}$('#closeTickets').addEventListener('click',closeTicketsModal);
-    $('#ticketsList').addEventListener('click',async e=>{const btn=e.target.closest('button[data-act]');if(!btn)return;const id=btn.dataset.id;const act=btn.dataset.act;if(act==='resolve'){await FB.db.collection('cbh_tickets').doc(id).update({status:'erledigt'})}if(act==='delete'){await FB.db.collection('cbh_tickets').doc(id).delete()}if(act==='reply'){activeTicketId=id;save('cbh_active_ticket',id);openReply(id)}});
-    function renderTickets(){const T=I18N[lang];ticketsList.innerHTML='';if(tickets.length===0){ticketsList.innerHTML='<p class="meta">'+T.tickets.none+'</p>';return}for(const t of tickets){const last=t.messages&&t.messages.length?t.messages[t.messages.length-1]:null;const preview=last?(last.by==='staff'?'👨‍💻 ':'👤 ')+escapeHTML(last.text).slice(0,80):escapeHTML(t.message).slice(0,80);const el=document.createElement('div');el.className='ticket';el.innerHTML=`<div><strong>Ticket:</strong> ${t.id} • <span class="tag">${t.status}</span></div><div class="meta">${(lang==='de'?'Von: ':'From: ')+t.from} • ${fmt(t.time)}</div><div style="margin:6px 0 8px;white-space:pre-wrap;">${preview}</div><div class="rowbtn"><button data-act="reply" data-id="${t.id}">${T.tickets.open}</button><button data-act="resolve" data-id="${t.id}">${T.tickets.resolve}</button><button data-act="delete" data-id="${t.id}">${T.tickets.del}</button></div>`;ticketsList.appendChild(el)}const open=tickets.filter(t=>t.status==='offen').length;openCount.textContent=' '+(lang==='de'?`(${open} offen)`: `(${open} open)`)}
-    function escapeHTML(s){return (s||'').replace(/[&<>]/g,t=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[t]))}
+    function openTickets(){ renderTickets(); show(ticketsModal); }
+    function closeTicketsModal(){ hide(ticketsModal); }
+    $('#closeTickets').addEventListener('click', closeTicketsModal);
+    $('#ticketsList').addEventListener('click', async (e)=>{
+      const btn=e.target.closest('button[data-act]'); if(!btn) return;
+      const id=btn.dataset.id; const act=btn.dataset.act;
+      if(act==='resolve'){ await FB.db.collection('cbh_tickets').doc(id).update({status:'erledigt'}); }
+      if(act==='delete'){ await FB.db.collection('cbh_tickets').doc(id).delete(); }
+      if(act==='reply'){ activeTicketId=id; save('cbh_active_ticket', id); openReply(id); }
+    });
+    function renderTickets(){
+      const T=I18N[lang];
+      ticketsList.innerHTML='';
+      if(tickets.length===0){ ticketsList.innerHTML='<p class="meta">'+T.tickets.none+'</p>'; return; }
+      for(const t of tickets){
+        const last=t.messages && t.messages.length ? t.messages[t.messages.length-1] : null;
+        const preview = last ? (last.by==='staff'?'👨‍💻 ':'👤 ') + escapeHTML(last.text).slice(0,80) : escapeHTML(t.message).slice(0,80);
+        const el=document.createElement('div');
+        el.className='ticket';
+        el.innerHTML=`
+          <div><strong>Ticket:</strong> ${t.id} • <span class="tag">${t.status}</span></div>
+          <div class="meta">${(lang==='de'?'Von: ':'From: ')+t.from} • ${fmt(t.time)}</div>
+          <div style="margin:6px 0 8px; white-space:pre-wrap;">${preview}</div>
+          <div class="rowbtn">
+            <button data-act="reply" data-id="${t.id}">${T.tickets.open}</button>
+            <button data-act="resolve" data-id="${t.id}">${T.tickets.resolve}</button>
+            <button data-act="delete" data-id="${t.id}">${T.tickets.del}</button>
+          </div>`;
+        ticketsList.appendChild(el);
+      }
+      const open = tickets.filter(t=>t.status==='offen').length;
+      $('#openCount').textContent = ' ' + (lang==='de'?`(${open} offen)`: `(${open} open)`);
+    }
+    function escapeHTML(s){ return (s||'').replace(/[&<>]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[t])); }
 
-    function openReply(id){const T=I18N[lang];const t=tickets.find(x=>x.id===id);if(!t)return;replyTicketId.textContent='#'+t.id;renderThread(t);replyText.placeholder=T.reply.ph;show(replyModal)}
-    function closeReply(){hide(replyModal)}replyBack.addEventListener('click',()=>{closeReply();openTickets()});
-    replyResolve.addEventListener('click',async ()=>{const id=activeTicketId;if(!id)return;await FB.db.collection('cbh_tickets').doc(id).update({status:'erledigt'});toast(lang==='de'?'Ticket erledigt ✅':'Ticket resolved ✅');renderTickets();closeReply()});
-    sendReply.addEventListener('click',async ()=>{const txt=(replyText.value||'').trim();if(!txt){toast(I18N[lang].toast.needReply);return}await FB.db.collection('cbh_tickets').doc(activeTicketId).update({messages:firebase.firestore.FieldValue.arrayUnion({by:'staff',text:txt,time:Date.now()})});replyText.value=''});
-    function renderThread(t){const T=I18N[lang];thread.innerHTML='';const msgs=Array.isArray(t.messages)?t.messages:[];for(const m of msgs){const d=document.createElement('div');d.className='tmsg '+(m.by==='staff'?'right':'');d.innerHTML=`<div class="who">${m.by==='staff'?T.reply.whoStaff:T.reply.whoUser}</div><div class="txt">${escapeHTML(m.text)}<div class="meta">${fmt(m.time)}</div></div>`;thread.appendChild(d)}thread.scrollTop=thread.scrollHeight}
+    function openReply(id){
+      const t=tickets.find(x=>x.id===id); if(!t) return;
+      $('#replyTicketId').textContent = '#'+t.id; renderThread(t); show(replyModal);
+    }
+    function closeReply(){ hide(replyModal); }
+    replyBack.addEventListener('click', ()=>{ closeReply(); openTickets(); });
+    replyResolve.addEventListener('click', async ()=>{
+      const id=activeTicketId; if(!id) return;
+      await FB.db.collection('cbh_tickets').doc(id).update({status:'erledigt'});
+      toast(lang==='de'?'Ticket erledigt ✅':'Ticket resolved ✅'); renderTickets(); closeReply();
+    });
+    sendReply.addEventListener('click', async ()=>{
+      const txt=(replyText.value||'').trim(); if(!txt){ toast(I18N[lang].toast.needReply); return; }
+      await FB.db.collection('cbh_tickets').doc(activeTicketId).update({
+        messages: firebase.firestore.FieldValue.arrayUnion({ by:'staff', text: txt, time: Date.now() })
+      });
+      replyText.value='';
+    });
+    function renderThread(t){
+      const whoStaff= (lang==='de'?'Mitarbeiter':'Support'), whoUser=(lang==='de'?'Kunde':'Customer');
+      thread.innerHTML='';
+      const msgs=Array.isArray(t.messages)?t.messages:[];
+      for(const m of msgs){
+        const d=document.createElement('div');
+        d.className='tmsg '+(m.by==='staff'?'right':'');
+        d.innerHTML = `<div class="who">${m.by==='staff'?whoStaff:whoUser}</div><div class="txt">${escapeHTML(m.text)}<div class="meta">${fmt(m.time)}</div></div>`;
+        thread.appendChild(d);
+      }
+      thread.scrollTop = thread.scrollHeight;
+    }
 
-    function subscribeTickets(){if(FB.unsub){try{FB.unsub()}catch{}FB.unsub=null}let q;if(staff){q=FB.db.collection('cbh_tickets').orderBy('time','desc').limit(200)}else{q=FB.db.collection('cbh_tickets').where('from','==',deviceId)}FB.unsub=q.onSnapshot(async snap=>{const arr=[];const mig=[];snap.forEach(doc=>{const d=doc.data()||{};const n=normalizeDoc(doc.id,d);arr.push(n);if(!Array.isArray(d.messages))mig.push({id:doc.id,n})});tickets=arr;for(const m of mig){try{await FB.db.collection('cbh_tickets').doc(m.id).update({messages:m.n.messages})}catch{}}if(mode==='staff')renderStaffChat();if(staff)renderTickets()},err=>{console.error('snapshot error',err);modeLabel.textContent='Error';liveDot.classList.remove('live')})}
+    function subscribeTickets(){
+      if(FB.unsub){ try{FB.unsub()}catch{} FB.unsub=null; }
+      let q;
+      if(staff){ q=FB.db.collection('cbh_tickets').orderBy('time','desc').limit(200); }
+      else     { q=FB.db.collection('cbh_tickets').where('from','==',deviceId); }
+      FB.unsub = q.onSnapshot(async (snap)=>{
+        const arr=[]; const mig=[];
+        snap.forEach(doc=>{
+          const d=doc.data()||{}; const n={ id:doc.id, from:d.from, time:d.time||0, status:d.status||'offen', message:d.message||'', messages: Array.isArray(d.messages)? d.messages: [] };
+          if(!Array.isArray(d.messages) && d.message){ n.messages=[{by:'user', text:d.message, time:d.time||Date.now()}]; mig.push({id:doc.id, n}); }
+          arr.push(n);
+        });
+        tickets=arr;
+        for(const m of mig){ try{ await FB.db.collection('cbh_tickets').doc(m.id).update({ messages: m.n.messages }); }catch{} }
+        if(mode==='staff') renderStaffChat();
+        if(staff) renderTickets();
+      }, (err)=>{ console.error('snapshot error', err); modeLabel.textContent='Error'; liveDot.style.background='#666'; });
+    }
 
-    function openLogin(){show(loginModal);hide($('#step2'));hide($('#step3'));show($('#step1'));setTimeout(()=>code1.focus(),50)}function closeLogin(){hide(loginModal)}
-    let logoClicks=0,logoTimer=null;logo.addEventListener('click',()=>{logoClicks++;if(logoTimer)clearTimeout(logoTimer);logoTimer=setTimeout(()=>{logoClicks=0},500);if(logoClicks>=3){openLogin();logoClicks=0}});
-    window.addEventListener('keydown',e=>{const isHash=e.key==='#'||e.code==='Backslash'||(e.code==='Digit3'&&(e.altKey||e.ctrlKey));if(e.ctrlKey&&e.altKey&&isHash){e.preventDefault();openLogin()}if(e.key==='Escape'){hide(contactModal);hide(loginModal);hide(ticketsModal);hide(replyModal)}});
-    cancelLogin.addEventListener('click',closeLogin);
-    next1.addEventListener('click',()=>{if(code1.value.trim()==='140318'){hide($('#step1'));show($('#step2'));email.focus()}else toast(I18N[lang].toast.wrongCode)});
-    next2.addEventListener('click',()=>{if((email.value||'').trim().toLowerCase()==='julian1339klausch@gmx.de'){hide($('#step2'));show($('#step3'));code2.focus()}else toast(I18N[lang].toast.wrongEmail)});
-    back1.addEventListener('click',()=>{hide($('#step2'));show($('#step1'))});back2.addEventListener('click',()=>{hide($('#step3'));show($('#step2'))});
-    finishLogin.addEventListener('click',()=>{if(code2.value.trim()==='11.09.2000'){sessionStorage.setItem('cbh_staff','1');staff=true;applyStaffUI();toast(I18N[lang].toast.loggedIn);closeLogin();subscribeTickets()}else toast(I18N[lang].toast.wrongCode2)});
+    function openLogin(){ show($('#loginModal')); hide($('#step2')); hide($('#step3')); show($('#step1')); setTimeout(()=>$('#code1').focus(), 50); }
+    function closeLogin(){ hide($('#loginModal')); }
+    let logoClicks=0, logoTimer=null;
+    logo.addEventListener('click', ()=>{ logoClicks++; if(logoTimer) clearTimeout(logoTimer); logoTimer=setTimeout(()=>{ logoClicks=0; }, 500); if(logoClicks>=3){ openLogin(); logoClicks=0; } });
+    window.addEventListener('keydown', (e)=>{
+      const isHash = e.key === '#' || e.code === 'Backslash' || (e.code==='Digit3' && (e.altKey||e.ctrlKey));
+      if(e.ctrlKey && e.altKey && isHash){ e.preventDefault(); openLogin(); }
+      if(e.key==='Escape'){ hide(contactModal); hide(loginModal); hide(ticketsModal); hide(replyModal); }
+    });
+    $('#cancelLogin').addEventListener('click', closeLogin);
+    $('#next1').addEventListener('click', ()=>{ if($('#code1').value.trim()==='140318'){ hide($('#step1')); show($('#step2')); $('#email').focus(); } else toast(I18N[lang].toast.wrongCode); });
+    $('#next2').addEventListener('click', ()=>{ if(($('#email').value||'').trim().toLowerCase()==='julian1339klausch@gmx.de'){ hide($('#step2')); show($('#step3')); $('#code2').focus(); } else toast(I18N[lang].toast.wrongEmail); });
+    $('#back1').addEventListener('click', ()=>{ hide($('#step2')); show($('#step1')); });
+    $('#back2').addEventListener('click', ()=>{ hide($('#step3')); show($('#step2')); });
+    $('#finishLogin').addEventListener('click', ()=>{
+      if($('#code2').value.trim()==='11.09.2000'){ sessionStorage.setItem('cbh_staff','1'); staff=true; applyStaffUI(); toast(I18N[lang].toast.loggedIn); closeLogin(); subscribeTickets(); }
+      else toast(I18N[lang].toast.wrongCode2);
+    });
+    $('#logoutBtn').addEventListener('click', ()=>{ staff=false; sessionStorage.removeItem('cbh_staff'); applyStaffUI(); toast(I18N[lang].toast.loggedOut); subscribeTickets(); });
 
-    function applyStaffUI(){const T=I18N[lang];if(staff){contactBtn.textContent=(lang==='de'?'Chat-Center':'Chat center');contactBtn.title=(lang==='de'?'Chat-Center öffnen':'Open chat center');show(logoutBtn);show(fab)}else{contactBtn.textContent=T.contactBtn;contactBtn.title=(lang==='de'?'Mitarbeiter kontaktieren':'Contact support');hide(logoutBtn);hide(fab)}updateBadge()}
-    logoutBtn.addEventListener('click',()=>{staff=false;sessionStorage.removeItem('cbh_staff');applyStaffUI();toast(I18N[lang].toast.loggedOut);subscribeTickets()});
-    fab.addEventListener('click',()=>{if(staff)openTickets()});
-
-    function updateBadge(){const openLocal=tickets.filter(t=>t.status==='offen').length;openCount.textContent=' '+(lang==='de'?`(${openLocal} offen)`:`(${openLocal} open)`);if(staff){if(openLocal>0){badge.textContent=String(openLocal);show(badge)}else hide(badge)}}
-    langBtn.addEventListener('click',()=>{lang=(lang==='de'?'en':'de');save('cbh_lang',lang);applyLang()});
-
-    if(!load('cbh_seen_v8',false)){const greet=I18N[lang].firstRun;botChat.push({role:'bot',text:greet,time:Date.now()});save('cbh_seen_v8',true)}
-    applyLang();renderChat();applyStaffUI();
+    function firstRun(){
+      if(!load('cbh_seen_v9', false)){
+        const greet = I18N[lang].firstRun;
+        botChat.push({role:'bot', text:greet, time: Date.now()});
+        save('cbh_seen_v9', true);
+      }
+    }
+    firstRun(); applyLang(); applyStaffUI(); applyResponsive(); renderChat();
   });
   </script>
 </body>
